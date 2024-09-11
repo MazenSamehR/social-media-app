@@ -25,12 +25,10 @@ namespace SocailMediaApp.Repositories
 
         public void AddUser(User user)
         {
-            /*user.Id = _users.Count + 1;*/
             _users.Add(user);
         }
 
-        //there's an UpdateUser method to save changes for verify function 
-        public void UpdateUser(User user)
+        public void UpdateUserConfirmation(User user)
         {
             User? foundUser = GetUserById(user.Id);
             if (foundUser != null)
@@ -38,6 +36,7 @@ namespace SocailMediaApp.Repositories
                 foundUser.EmailConfirmed = true;
             }
         }
+        
 
         public void DeleteUser(User user)
         {
@@ -45,10 +44,10 @@ namespace SocailMediaApp.Repositories
         }
         public void DeleteUser(int userId)
         {
-            User user = GetUserById(userId);
+            User? user = GetUserById(userId);
             if (user == null)
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException("User not found!");
             }
             _users.Remove(user);
         }

@@ -121,7 +121,7 @@ namespace SocailMediaApp.Services
                 }
 
                 foundUser.EmailConfirmed = true;
-                _userRepository.UpdateUser(foundUser); 
+                _userRepository.UpdateUserConfirmation(foundUser); 
             
 
         }
