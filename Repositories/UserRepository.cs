@@ -6,7 +6,11 @@ namespace SocailMediaApp.Repositories
 {
     public class UserRepository
     {
-        public static List<User> _users = new List<User>();
+        public List<User> _users;
+        public UserRepository(List<User> users)
+        {
+            _users = users;
+        }
 
         public List<User> GetAllUsers()
         {
@@ -23,9 +27,45 @@ namespace SocailMediaApp.Repositories
             return _users.FirstOrDefault(u => u.Id.Equals(id));
         }
 
+        public List<User> GetAllFollowing(int userId)
+        {
+            User? user = GetUserById(userId);
+            if (user == null)
+                throw new NotFoundException("User not found");
+            return user.Following;
+        }
+        public List<User> GetAllFollowers(int userId)
+        {
+            User? user = GetUserById(userId);
+            if (user == null)
+                throw new NotFoundException("User not found");
+            return user.Followers;
+        }
+
+        public bool IsFollowing(User sender,User receiver)
+        {
+            return sender.Following.Find(following => following.Equals(receiver)) != null;
+        }
+
         public void AddUser(User user)
         {
+            user.Id = _users.Count + 1;
             _users.Add(user);
+        }
+
+        public void FollowUser(User sender,User receiver)
+        {
+            sender.Following.Add(receiver);
+            receiver.Followers.Add(sender);
+
+            // TODO : save users info into the database instead of the in-memory list
+        }
+        public void UnfollowUser(User sender, User receiver)
+        {
+            sender.Following.Remove(receiver);
+            receiver.Followers.Remove(sender);
+
+            // TODO : save users info into the database instead of the in-memory list
         }
 
         public void UpdateUserConfirmation(User user)

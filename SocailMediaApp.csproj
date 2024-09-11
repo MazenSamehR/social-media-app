@@ -13,10 +13,4 @@
 	  <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ViewModels\" />
-    <Folder Include="Repositories\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>

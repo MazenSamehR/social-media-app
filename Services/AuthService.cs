@@ -9,7 +9,12 @@ namespace SocailMediaApp.Services
 {
     public class AuthService
     {
-        private readonly UserRepository _userRepository = new UserRepository();
+        private UserRepository _userRepository;
+
+        public AuthService(UserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
 
         public List<User> GetAllUsers()
         {
@@ -43,9 +48,9 @@ namespace SocailMediaApp.Services
             _userRepository.AddUser(convertedUser);
             try
             {
-                SendConfirmationEmail(convertedUser,httpRequest);
+                SendConfirmationEmail(convertedUser, httpRequest);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _userRepository.DeleteUser(convertedUser);
                 throw new MailConfirmationException(e.Message);
@@ -75,7 +80,9 @@ namespace SocailMediaApp.Services
 
                 using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                 {
-                    smtp.Credentials = new System.Net.NetworkCredential("mohanadkhaled87@gmail.com", "vstrbuwwmjoanuih");
+                    String username = "";
+                    String password = "";
+                    smtp.Credentials = new System.Net.NetworkCredential(username, password);
                     smtp.EnableSsl = true;
                     smtp.Send(mail);
                 }
@@ -97,10 +104,10 @@ namespace SocailMediaApp.Services
                     throw new InvalidException("Wrong Password!");
                 }
 
-                if (!foundUser.EmailConfirmed)
+                /*if (!foundUser.EmailConfirmed)
                 {
                     throw new InvalidException("Email not confirmed!");
-                }
+                }*/
 
                 return "TOKEN";
            

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
 using SocailMediaApp.Docs.AuthExamples.Login;
 using SocailMediaApp.Docs.AuthExamples.Registration;
 using SocailMediaApp.Docs.AuthExamples.Verification;
@@ -10,18 +8,21 @@ using SocailMediaApp.Services;
 using SocailMediaApp.Utils;
 using SocailMediaApp.ViewModels;
 using Swashbuckle.AspNetCore.Filters;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Net.Mail;
 
 
 namespace SocailMediaApp.Controllers
 {
 
-    [Route("api/v1")]
+    [Route("api/v1/auth")]
     public class AuthenticationController : ControllerBase
     {
-        private static AuthService authService = new AuthService();
+        private AuthService authService;
+
+        public AuthenticationController(AuthService authService)
+        {
+            this.authService = authService;
+        }
 
 
         [HttpGet]

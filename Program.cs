@@ -1,13 +1,17 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.OpenApi.Models;
-using SocailMediaApp.Exceptions;
+using SocailMediaApp.Models;
+using SocailMediaApp.Repositories;
+using SocailMediaApp.Services;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddSingleton<List<User>>();
+builder.Services.AddSingleton<UserRepository>();
+builder.Services.AddSingleton<FollowingManagementService>();
+builder.Services.AddSingleton<AuthService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
