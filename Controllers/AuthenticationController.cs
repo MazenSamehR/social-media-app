@@ -8,12 +8,13 @@ using SocailMediaApp.Utils;
 using SocailMediaApp.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Net.Mail;
 
 
 namespace SocailMediaApp.Controllers
 {
     
-    [Route("api/v1/[controller]")]
+    [Route("api/v1")]
     public class AuthenticationController : ControllerBase
     {
         private static AuthService authService = new AuthService();
@@ -54,7 +55,7 @@ namespace SocailMediaApp.Controllers
             }
             try
             {
-                authService.Register(user);
+                authService.Register(user,HttpContext.Request);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "User Registered, Check your mail to confirm";
@@ -67,6 +68,14 @@ namespace SocailMediaApp.Controllers
                 apiResponse.Body = null;
                 apiResponse.Message = ex.Message;
                 apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return apiResponse;
+            }
+            catch(MailConfirmationException ex)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Error while sending mail to your account. Please register again";
+                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
                 return apiResponse;
             }
             catch (Exception ex)
@@ -137,7 +146,7 @@ namespace SocailMediaApp.Controllers
             }
         }
 
-        [HttpPost("verify/{id}")]
+        [HttpGet("verify/{id}")]
         public ActionResult<ApiResponse<Object>> Verify(int id)
         {
             try

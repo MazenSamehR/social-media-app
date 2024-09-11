@@ -1,4 +1,5 @@
 ﻿using SocailMediaApp.Controllers;
+using SocailMediaApp.Exceptions;
 using SocailMediaApp.Models;
 
 namespace SocailMediaApp.Repositories
@@ -38,7 +39,19 @@ namespace SocailMediaApp.Repositories
             }
         }
 
-
+        public void DeleteUser(User user)
+        {
+            _users.Remove(user);
+        }
+        public void DeleteUser(int userId)
+        {
+            User user = GetUserById(userId);
+            if (user == null)
+            {
+                throw new NotFoundException("User not found");
+            }
+            _users.Remove(user);
+        }
 
 
     }
