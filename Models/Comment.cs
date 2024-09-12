@@ -8,5 +8,6 @@
         public int UserId { get; set; }
         public DateTime PublishedOn { get; set; }
         public User Author { get; set; }
+        public Post Post{ get; set; }
     }
 }

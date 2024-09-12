@@ -25,6 +25,13 @@ namespace SocailMediaApp.Repositories
         {
             return _posts.Where(p => p.UserId == userId).ToList();
         }
+
+        public Comment GetCommendById(int postId,int commendId)
+        {
+            var post = _posts.FirstOrDefault(p => p.Id == postId);
+            return post?.Comments.FirstOrDefault(c => c.Id == commendId);
+        }
+
         public void UpdatePost(Post post)
         {
             var existingPost = _posts.FirstOrDefault(p => p.Id == post.Id);
@@ -33,6 +40,25 @@ namespace SocailMediaApp.Repositories
                 existingPost.Content = post.Content;
                 existingPost.PublishedOn = post.PublishedOn;
             }
+        }
+        public void AddCommentToPost(Comment comment,Post post)
+        {
+            var existingPost = _posts.FirstOrDefault(p => p.Id == post.Id);
+            existingPost?.Comments.Add(comment);
+        }
+        public void UpdateCommentInPost(Comment comment, Post post)
+        {
+            var existingPost = _posts.FirstOrDefault(p => p.Id == post.Id);
+            var existingComment = existingPost?.Comments.FirstOrDefault(c => c.Id == comment.Id);
+            if (existingComment != null)
+            {
+                existingComment.Content = comment.Content;
+            }
+        }
+        public void DeleteCommendtFromPost(Comment comment, Post post)
+        {
+            var existingPost = _posts.FirstOrDefault(p => p.Id == post.Id);
+            existingPost?.Comments.Remove(comment);
         }
         public void DeletePost(int id)
         {

@@ -269,5 +269,103 @@ namespace SocailMediaApp.Controllers
             }
         }
 
+
+        // Comment Endpoints
+        [HttpPost("comments")]
+       /* [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+*//*        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(SuccessfulCreateCommentResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundCreateCommentResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorCreateCommentResponseExample))]*/
+        public ActionResult<ApiResponse<Object>> AddCommentToPost([FromBody] SaveCommentViewModel comment)
+        {
+            try
+            {
+                _postService.AddCommentToPost(comment);
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Comment added successfully";
+                apiResponse.StatusCode = HttpStatusCode.Created;
+                return apiResponse;
+            }
+            catch (NotFoundException ex)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = ex.Message;
+                apiResponse.StatusCode = HttpStatusCode.NotFound;
+                return apiResponse;
+            }
+            catch (Exception e)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Internal Server Error, Try again later";
+                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                return apiResponse;
+            }
+        }
+
+        [HttpPut("{postId}/comments")]
+        public ActionResult<ApiResponse<Object>> UpdateCommentInPost(int postId, [FromBody] ChangedCommentViewModel comment)
+        {
+            try
+            {
+                _postService.UpdateCommentInPost(postId, comment);
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Comment updated successfully";
+                apiResponse.StatusCode = HttpStatusCode.OK;
+                return apiResponse;
+            }
+            catch (NotFoundException ex)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = ex.Message;
+                apiResponse.StatusCode = HttpStatusCode.NotFound;
+                return apiResponse;
+            }
+            catch (Exception e)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Internal Server Error, Try again later";
+                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                return apiResponse;
+            }
+        }
+
+        [HttpDelete("{postId}/comments")]
+        public ActionResult<ApiResponse<Object>> DeleteCommentFromPost(int postId, [FromBody] ChangedCommentViewModel comment)
+        {
+            try
+            {
+                _postService.DeleteCommentFromPost(postId, comment);
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Comment deleted successfully";
+                apiResponse.StatusCode = HttpStatusCode.OK;
+                return apiResponse;
+            }
+            catch (NotFoundException ex)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = ex.Message;
+                apiResponse.StatusCode = HttpStatusCode.NotFound;
+                return apiResponse;
+            }
+            catch (Exception e)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Internal Server Error, Try again later";
+                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                return apiResponse;
+            }
+        }
+
     }
 }

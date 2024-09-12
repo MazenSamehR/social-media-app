@@ -7,5 +7,6 @@
         public int UserId { get; set; }
         public DateTime PublishedOn { get; set; }
         public User Author { get; set; }
+        public List<Comment> Comments { get; set; } = new List<Comment>();
     }
 }
