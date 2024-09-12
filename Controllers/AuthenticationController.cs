@@ -1,22 +1,28 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
+using SocailMediaApp.Docs.AuthExamples.Login;
+using SocailMediaApp.Docs.AuthExamples.Registration;
+using SocailMediaApp.Docs.AuthExamples.Verification;
 using SocailMediaApp.Exceptions;
 using SocailMediaApp.Models;
 using SocailMediaApp.Services;
 using SocailMediaApp.Utils;
 using SocailMediaApp.ViewModels;
-using System.ComponentModel.DataAnnotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Net;
 
 
 namespace SocailMediaApp.Controllers
 {
-    
-    [Route("api/v1/[controller]")]
+
+    [Route("api/v1/auth")]
     public class AuthenticationController : ControllerBase
     {
-        private static AuthService authService = new AuthService();
+        private AuthService authService;
+
+        public AuthenticationController(AuthService authService)
+        {
+            this.authService = authService;
+        }
 
 
         [HttpGet]
@@ -31,7 +37,15 @@ namespace SocailMediaApp.Controllers
             return apiResponse;
         }
 
+
+        
         [HttpPost("register")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(RegisterSuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(RegisterValidationErrorResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(RegisterInternalServerErrorResponseExample))]
         public ActionResult<ApiResponse<Object>> Register([FromBody] RegisterUserViewModel user)
         {
             if (!ModelState.IsValid)
@@ -54,7 +68,7 @@ namespace SocailMediaApp.Controllers
             }
             try
             {
-                authService.Register(user);
+                authService.Register(user,HttpContext.Request);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "User Registered, Check your mail to confirm";
@@ -67,6 +81,14 @@ namespace SocailMediaApp.Controllers
                 apiResponse.Body = null;
                 apiResponse.Message = ex.Message;
                 apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                return apiResponse;
+            }
+            catch(MailConfirmationException ex)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Error while sending mail to your account. Please register again";
+                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
                 return apiResponse;
             }
             catch (Exception ex)
@@ -82,6 +104,14 @@ namespace SocailMediaApp.Controllers
         }
 
         [HttpPost("login")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(LoginSuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(LoginValidationErrorResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(LoginNotFoundErrorResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(LoginInternalServerErrorResponseExample))]
         public ActionResult<ApiResponse<Object>> Login([FromBody] LoginUserViewModel user)
         {
             if (!ModelState.IsValid)
@@ -137,7 +167,13 @@ namespace SocailMediaApp.Controllers
             }
         }
 
-        [HttpPost("verify/{id}")]
+
+
+        [HttpGet("verify/{id}")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(VerifySuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(VerifyInternalServerErrorResponseExample))]
         public ActionResult<ApiResponse<Object>> Verify(int id)
         {
             try

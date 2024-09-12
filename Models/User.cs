@@ -19,5 +19,8 @@ namespace SocailMediaApp.Models
         [Phone]
         public string? Phone { get; set; }
         public string? Address { get; set; }
+
+        public List<User> Following = new List<User>();
+        public List<User> Followers = new List<User>();
     }
 }
