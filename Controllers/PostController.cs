@@ -1,8 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SocailMediaApp.Docs.PostExamples.CreatePost;
+using SocailMediaApp.Docs.PostExamples.DeletePost;
+using SocailMediaApp.Docs.PostExamples.GetSinglePost;
+using SocailMediaApp.Docs.PostExamples.GetUserHomePosts;
+using SocailMediaApp.Docs.PostExamples.GetUserPosts;
+using SocailMediaApp.Docs.PostExamples.UpdatePost;
 using SocailMediaApp.Exceptions;
 using SocailMediaApp.Services;
 using SocailMediaApp.Utils;
 using SocailMediaApp.ViewModels;
+using Swashbuckle.AspNetCore.Filters;
 using System.Net;
 
 namespace SocailMediaApp.Controllers
@@ -18,6 +25,12 @@ namespace SocailMediaApp.Controllers
 
 
         [HttpPost]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(SuccessfulCreatePostResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundCreatePostResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorCreatePostResponseExample))]
         public ActionResult<ApiResponse<Object>> CreatePost([FromBody] SavePostViewModel postViewModel)
         {
             try
@@ -71,7 +84,16 @@ namespace SocailMediaApp.Controllers
                 return apiResponse;
             }
         }
+
+
+
         [HttpGet("user/{id}")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UserPostsSuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundGetUserPostsResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorGetUserPostsResponseExample))]
         public ActionResult<ApiResponse<Object>> GetUserPosts(int id)
         {
             try
@@ -102,6 +124,12 @@ namespace SocailMediaApp.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetSinglePostSuccessfulResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(PostNotFoundResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(GetSinglePostInternalServerErrorResponseExample))]
         public ActionResult<ApiResponse<Object>> GetPost(int id)
         {
             try
@@ -132,6 +160,12 @@ namespace SocailMediaApp.Controllers
         }
         
         [HttpGet("home/{id}")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulGetUserHomePostsResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundGetUserHomePostsResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorGetUserHomePostsResponseExample))]
         public ActionResult<ApiResponse<Object>> GetUserHomePosts(int id)
         {
             try
@@ -163,6 +197,13 @@ namespace SocailMediaApp.Controllers
 
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulUpdatePostResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundUpdatePostResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorUpdatePostResponseExample))]
+
         public ActionResult<ApiResponse<Object>> UpdatePost(int id, [FromBody] UpdatePostViewModel post)
         {
             try
@@ -193,6 +234,12 @@ namespace SocailMediaApp.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulDeletePostResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundDeletePostResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorDeletePostResponseExample))]
         public ActionResult<ApiResponse<Object>> DeletePost(int id)
         {
             try
