@@ -22,5 +22,6 @@ namespace SocailMediaApp.Models
 
         public List<User> Following = new List<User>();
         public List<User> Followers = new List<User>();
+        public List<Post> Posts = new List<Post>();
     }
 }

@@ -92,43 +92,43 @@ namespace SocailMediaApp.Services
         public string Login(LoginUserViewModel user)
         {
 
-            User? foundUser = _userRepository.GetUserByEmail(user.Email);
-            if (foundUser == null)
-            {
-                throw new NotFoundException("Email not found!");
-            }
+                User? foundUser = _userRepository.GetUserByEmail(user.Email);
+                if (foundUser == null)
+                {
+                    throw new NotFoundException("Email not found!");
+                }
 
-            bool matchingPassword = BCrypt.Net.BCrypt.Verify(user.Password, foundUser.Password);
-            if (!matchingPassword)
-            {
-                throw new InvalidException("Wrong Password!");
-            }
+                bool matchingPassword = BCrypt.Net.BCrypt.Verify(user.Password, foundUser.Password);
+                if (!matchingPassword)
+                {
+                    throw new InvalidException("Wrong Password!");
+                }
 
-            if (!foundUser.EmailConfirmed)
-            {
-                throw new InvalidException("Email not confirmed!");
-            }
+                if (!foundUser.EmailConfirmed)
+                {
+                    throw new InvalidException("Email not confirmed!");
+                }
 
-            return "TOKEN";
+                return "TOKEN";
            
         }
 
         public void Verify(int id)
         {
  
-            User? foundUser = _userRepository.GetUserById(id);
-            if (foundUser == null)
-            {
-                throw new KeyNotFoundException("User not found!");
-            }
+                User? foundUser = _userRepository.GetUserById(id);
+                if (foundUser == null)
+                {
+                    throw new KeyNotFoundException("User not found!");
+                }
 
-            if (foundUser.EmailConfirmed)
-            {
-                throw new InvalidOperationException("Email already confirmed!");
-            }
+                if (foundUser.EmailConfirmed)
+                {
+                    throw new InvalidOperationException("Email already confirmed!");
+                }
 
-            foundUser.EmailConfirmed = true;
-            _userRepository.UpdateUserConfirmation(foundUser); 
+                foundUser.EmailConfirmed = true;
+                _userRepository.UpdateUserConfirmation(foundUser); 
             
 
         }
