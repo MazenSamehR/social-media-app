@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SocailMediaApp.Docs.FollowExamples.FollowUser;
+using SocailMediaApp.Docs.FollowingExamples.FollowUser;
 using SocailMediaApp.Exceptions;
 using SocailMediaApp.Services;
 using SocailMediaApp.Utils;
 using SocailMediaApp.ViewModels;
+using Swashbuckle.AspNetCore.Filters;
 using System.Net;
 
 namespace SocailMediaApp.Controllers
@@ -18,6 +21,15 @@ namespace SocailMediaApp.Controllers
         }
 
         [HttpPost("follow")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(FollowSuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(FollowNotFoundResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(FollowBadRequestResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(FollowYourselfesponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(FollowInternalServerErrorResponseExample))]
         public ActionResult<ApiResponse<Object>> Follow([FromBody] FollowRequestViewModel friendRequest)
         {
             try
@@ -64,6 +76,15 @@ namespace SocailMediaApp.Controllers
 
         }
         [HttpGet("following/{userId}")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(FollowingListSuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(FollowingListNotFoundResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(FollowingListBadRequestResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(FollowingListInternalServerErrorResponseExample))]
+
         public ActionResult<ApiResponse<Object>> GetFollowingList(int userId)
         {
             try
@@ -100,7 +121,17 @@ namespace SocailMediaApp.Controllers
                 return apiResponse;
             }
         }
+        
         [HttpGet("follower/{userId}")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(FollowingListSuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(FollowingListNotFoundResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(FollowingListBadRequestResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(FollowingListInternalServerErrorResponseExample))]
+
         public ActionResult<ApiResponse<Object>> GetFollowerList(int userId)
         {
             try
@@ -138,8 +169,35 @@ namespace SocailMediaApp.Controllers
             }
         }
         [HttpPost("unfollow")]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UnfollowSuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(UnfollowNotFoundResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(UnfollowBadRequestResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(UnfollowInternalServerErrorResponseExample))]
+
         public ActionResult<ApiResponse<Object>> Unfollow([FromBody] FollowRequestViewModel friendRequest)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(ms => ms.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => string.Join("; ", kvp.Value.Errors.Select(e => e.ErrorMessage))
+                        );
+
+                ApiResponse<object> validationResponse = new ApiResponse<object>
+                {
+                    Body = errors,
+                    Message = "Invalid data!",
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+
+                return validationResponse;
+            }
             try
             {
                 _followingManagementService.Unfollow(friendRequest);
