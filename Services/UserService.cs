@@ -1,4 +1,6 @@
-﻿using SocailMediaApp.Exceptions;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using SocailMediaApp.Exceptions;
 using SocailMediaApp.Models;
 using SocailMediaApp.Repositories;
 using SocailMediaApp.ViewModels;
@@ -10,10 +12,12 @@ namespace SocailMediaApp.Services
     public class UserService
     {
         private UserRepository _userRepository;
+        private ImageService _imageService;
 
-        public UserService(UserRepository userRepository)
+        public UserService(UserRepository userRepository,ImageService imageService )
         {
             _userRepository = userRepository;
+            _imageService = imageService;
         }
 
         public List<UserFriendViewModel> GetAllUsers()
@@ -26,7 +30,8 @@ namespace SocailMediaApp.Services
                 UserFriendViewModel userFriendViewModel = new UserFriendViewModel
                 {
                     Id = user.Id,
-                    Name = user.Name
+                    Name = user.Name,
+                    ProfileImageUrl = user.ProfileImageUrl
                 };
                 userFriendViewModels.Add(userFriendViewModel);
             }
@@ -136,6 +141,31 @@ namespace SocailMediaApp.Services
                 _userRepository.UpdateUserConfirmation(foundUser); 
             
 
+        }
+        public void UpdateUser(int id, UpdateUserViewModel user)
+        {
+            User? foundUser = _userRepository.GetUserById(id);
+            if (foundUser == null)
+            {
+                throw new NotFoundException("User not found!");
+            }
+            if(user.Name != null)
+                foundUser.Name = user.Name;
+            if(user.Email != null)
+                foundUser.Email = user.Email;
+            if(user.Password != null)
+                foundUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            if (user.Phone != null)
+                foundUser.Phone = user.Phone;
+            if(user.Address != null)
+                foundUser.Address = user.Address;
+            if (user.ProfileImage != null)
+            {
+                string imageUrl = _imageService.UploadImage(user.ProfileImage);
+                foundUser.ProfileImageUrl = imageUrl;
+            }
+
+            _userRepository.UpdateUser(id,foundUser);
         }
     }
 }

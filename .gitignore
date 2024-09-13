@@ -5,6 +5,8 @@ project.lock.json
 *.pyc
 nupkg/
 
+.env
+
 # Visual Studio Code
 .vscode/
 
@@ -41,3 +43,4 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+/.env

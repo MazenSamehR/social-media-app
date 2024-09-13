@@ -77,6 +77,23 @@ namespace SocailMediaApp.Repositories
             }
         }
         
+        public void UpdateUser(int userId, User user)
+        {
+            User? foundUser = GetUserById(userId);
+            if (foundUser == null)
+            {
+                throw new NotFoundException("User not found!");
+            }
+            foundUser.Name = user.Name;
+            foundUser.Email = user.Email;
+            foundUser.Password = user.Password;
+            foundUser.ProfileImageUrl = user.ProfileImageUrl;
+            foundUser.EmailConfirmed = user.EmailConfirmed;
+            foundUser.Phone = user.Phone;
+            foundUser.Address = user.Address;
+            // TODO : save users info into the database instead of the in-memory list
+
+        }
 
         public void DeleteUser(User user)
         {

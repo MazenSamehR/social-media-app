@@ -24,7 +24,8 @@ namespace SocailMediaApp.Services
                 UserFriendViewModel userFriendViewModel = new UserFriendViewModel
                 {
                     Id = comment.Author.Id,
-                    Name = comment.Author.Name
+                    Name = comment.Author.Name,
+                    ProfileImageUrl = comment.Author.ProfileImageUrl
                 };
                 ReadCommentViewModel commentViewModel = new ReadCommentViewModel
                 {
@@ -48,6 +49,7 @@ namespace SocailMediaApp.Services
                 Content = post.Content,
                 UserId = post.UserId,
                 PublishedOn = post.PublishedOn,
+                ProfileImageUrl = post.Author.ProfileImageUrl,
                 Comments = commentViewModels
             };
             return postViewModel;

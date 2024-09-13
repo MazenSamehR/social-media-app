@@ -15,6 +15,7 @@ namespace SocailMediaApp.Models
         [Required]
         [MinLength(8)]
         public string Password { get; set; } = string.Empty;
+        public string? ProfileImageUrl { get; set; }
         public bool EmailConfirmed { get; set; }
         [Phone]
         public string? Phone { get; set; }

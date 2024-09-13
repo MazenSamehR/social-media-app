@@ -182,7 +182,63 @@ namespace SocailMediaApp.Controllers
             }
         }
 
+        // update user details including a profile picture
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+    /*    [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UpdateUserSuccessResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(UpdateUserValidationErrorResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(UpdateUserNotFoundResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(UpdateUserInternalServerErrorResponseExample))]
+       */
+        public ActionResult<ApiResponse<Object>> UpdateUser(int id, [FromForm] UpdateUserViewModel user)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(ms => ms.Value.Errors.Count > 0)
+                    .ToDictionary(
+                                    kvp => kvp.Key,
+                                    kvp => string.Join("; ", kvp.Value.Errors.Select(e => e.ErrorMessage))
+                                );
 
+                ApiResponse<object> validationResponse = new ApiResponse<object>
+                {
+                    Body = errors,
+                    Message = "Invalid data!",
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+
+                return validationResponse;
+            }
+            try
+            {
+                authService.UpdateUser(id, user);
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "User Updated!";
+                apiResponse.StatusCode = HttpStatusCode.OK;
+                return apiResponse;
+            }
+            catch (NotFoundException ex)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = ex.Message;
+                apiResponse.StatusCode = HttpStatusCode.NotFound;
+                return apiResponse;
+            }
+            catch (Exception ex)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Internal Server Error, Try again later";
+                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                return apiResponse;
+            }
+        }
 
         [HttpGet("verify/{id}")]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
