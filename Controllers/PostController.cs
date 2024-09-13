@@ -31,7 +31,7 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status201Created, typeof(SuccessfulCreatePostResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundCreatePostResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorCreatePostResponseExample))]
-        public ActionResult<ApiResponse<Object>> CreatePost([FromBody] SavePostViewModel postViewModel)
+        public ActionResult<ApiResponse<Object>> CreatePost([FromForm] SavePostViewModel postViewModel)
         {
             try
             {

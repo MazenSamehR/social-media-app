@@ -149,9 +149,9 @@ namespace SocailMediaApp.Controllers
             }
             try
             {
-                String token = authService.Login(user);
+                ReturnedUserView returnedUser = authService.Login(user);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
-                apiResponse.Body = token;
+                apiResponse.Body = returnedUser;
                 apiResponse.Message = "Login successful!";
                 apiResponse.StatusCode = HttpStatusCode.Created;
                 return apiResponse;

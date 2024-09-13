@@ -10,10 +10,12 @@ namespace SocailMediaApp.Services
     {
         private PostRepository _postRepository;
         private UserRepository _userRepository;
-        public PostService(PostRepository postRepository, UserRepository userRepository)
+        private ImageService _imageService;
+        public PostService(PostRepository postRepository, UserRepository userRepository, ImageService imageService)
         {
             _postRepository = postRepository;
             _userRepository = userRepository;
+            _imageService = imageService;
         }
 
         private List<ReadCommentViewModel> AddCommentViewModel(Post post)
@@ -50,6 +52,7 @@ namespace SocailMediaApp.Services
                 UserId = post.UserId,
                 PublishedOn = post.PublishedOn,
                 ProfileImageUrl = post.Author.ProfileImageUrl,
+                PostImageUrl = post.ImageUrl,
                 Comments = commentViewModels
             };
             return postViewModel;
@@ -65,6 +68,10 @@ namespace SocailMediaApp.Services
             convertedPost.Author = foundUser;
             convertedPost.Content = post.Content;
             convertedPost.PublishedOn = DateTime.Now;
+            if(post.Image != null)
+            {
+                convertedPost.ImageUrl = _imageService.UploadImage(post.Image);
+            }
             _postRepository.AddPost(convertedPost);
         }
 

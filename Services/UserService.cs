@@ -56,7 +56,7 @@ namespace SocailMediaApp.Services
             };
 
             _userRepository.AddUser(convertedUser);
-            try
+            /*try
             {
                 SendConfirmationEmail(convertedUser, httpRequest);
             }
@@ -64,7 +64,7 @@ namespace SocailMediaApp.Services
             {
                 _userRepository.DeleteUser(convertedUser);
                 throw new MailConfirmationException(e.Message);
-            }
+            }*/
 
         }
         private void SendConfirmationEmail(User user,HttpRequest httpRequest)
@@ -99,7 +99,7 @@ namespace SocailMediaApp.Services
             }
         }
 
-        public string Login(LoginUserViewModel user)
+        public ReturnedUserView Login(LoginUserViewModel user)
         {
 
                 User? foundUser = _userRepository.GetUserByEmail(user.Email);
@@ -114,12 +114,20 @@ namespace SocailMediaApp.Services
                     throw new InvalidException("Wrong Password!");
                 }
 
-                if (!foundUser.EmailConfirmed)
+                /*if (!foundUser.EmailConfirmed)
                 {
                     throw new InvalidException("Email not confirmed!");
-                }
-
-                return "TOKEN";
+                }*/
+                ReturnedUserView returnedUserView = new ReturnedUserView
+                {
+                    Id = foundUser.Id,
+                    Name = foundUser.Name,
+                    Email = foundUser.Email,
+                    Phone = foundUser.Phone,
+                    Address = foundUser.Address,
+                    ProfileImageUrl = foundUser.ProfileImageUrl
+                };
+                return returnedUserView;
            
         }
 

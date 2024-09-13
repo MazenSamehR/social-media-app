@@ -29,7 +29,21 @@ builder.Services.AddSingleton(provider =>
     return cloudinary;
 });
 
+
+
 //=================================
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "AllowAllOrigins",
+        configurePolicy: policy =>
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 builder.Services.AddSingleton<List<User>>();
 builder.Services.AddSingleton<List<Post>>();
@@ -66,5 +80,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("AllowAllOrigins");
 
 app.Run();
