@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SocailMediaApp.Docs;
 using SocailMediaApp.Docs.AuthExamples.Login;
 using SocailMediaApp.Docs.AuthExamples.Registration;
 using SocailMediaApp.Docs.AuthExamples.Verification;
@@ -14,27 +15,41 @@ using System.Net;
 namespace SocailMediaApp.Controllers
 {
 
-    [Route("api/v1/auth")]
-    public class AuthenticationController : ControllerBase
+    [Route("api/v1/users")]
+    public class UserManagemntController : ControllerBase
     {
-        private AuthService authService;
+        private UserService authService;
 
-        public AuthenticationController(AuthService authService)
+        public UserManagemntController(UserService authService)
         {
             this.authService = authService;
         }
 
 
         [HttpGet]
-        public ActionResult<ApiResponse<List<User>>> GetAllUsers()
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetAllUsersSuccessfulResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorDeleteCommentResponseExample))]
+        public ActionResult<ApiResponse<Object>> GetAllUsers()
         {
-
-            List<User> users = authService.GetAllUsers();
-            ApiResponse<List<User>> apiResponse = new ApiResponse<List<User>>();
-            apiResponse.Body = users;
-            apiResponse.Message = "Users fetched!";
-            apiResponse.StatusCode = HttpStatusCode.OK;
-            return apiResponse;
+            try
+            {
+                List<UserFriendViewModel> users = authService.GetAllUsers();
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = users;
+                apiResponse.Message = "Users fetched!";
+                apiResponse.StatusCode = HttpStatusCode.OK;
+                return apiResponse;
+            }
+            catch(Exception ex)
+            {
+                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
+                apiResponse.Body = null;
+                apiResponse.Message = "Internal Server Error, Try again later";
+                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
+                return apiResponse;
+            }
         }
 
 

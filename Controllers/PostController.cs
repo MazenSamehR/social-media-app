@@ -272,12 +272,12 @@ namespace SocailMediaApp.Controllers
 
         // Comment Endpoints
         [HttpPost("comments")]
-       /* [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
-*//*        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(SuccessfulCreateCommentResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(SuccessfulCreateCommentResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundCreateCommentResponseExample))]
-        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorCreateCommentResponseExample))]*/
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorCreateCommentResponseExample))]
         public ActionResult<ApiResponse<Object>> AddCommentToPost([FromBody] SaveCommentViewModel comment)
         {
             try
@@ -308,6 +308,12 @@ namespace SocailMediaApp.Controllers
         }
 
         [HttpPut("{postId}/comments")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulUpdateCommentResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundUpdateCommentResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorUpdateCommentResponseExample))]
         public ActionResult<ApiResponse<Object>> UpdateCommentInPost(int postId, [FromBody] ChangedCommentViewModel comment)
         {
             try
@@ -338,6 +344,12 @@ namespace SocailMediaApp.Controllers
         }
 
         [HttpDelete("{postId}/comments")]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulDeleteCommentResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundDeleteCommentResponseExample))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorDeleteCommentResponseExample))]
         public ActionResult<ApiResponse<Object>> DeleteCommentFromPost(int postId, [FromBody] ChangedCommentViewModel comment)
         {
             try

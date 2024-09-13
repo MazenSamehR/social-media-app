@@ -14,7 +14,7 @@ builder.Services.AddSingleton<UserRepository>();
 builder.Services.AddSingleton<PostRepository>();
 builder.Services.AddSingleton<FollowingManagementService>();
 builder.Services.AddSingleton<PostService>();
-builder.Services.AddSingleton<AuthService>();
+builder.Services.AddSingleton<UserService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -7,25 +7,30 @@ using System.Net.Mail;
 
 namespace SocailMediaApp.Services
 {
-    public class AuthService
+    public class UserService
     {
         private UserRepository _userRepository;
 
-        public AuthService(UserRepository userRepository)
+        public UserService(UserRepository userRepository)
         {
             _userRepository = userRepository;
         }
 
-        public List<User> GetAllUsers()
+        public List<UserFriendViewModel> GetAllUsers()
         {
-            try
+            List<User> users = _userRepository.GetAllUsers();
+            //convert users to user friend view models
+            List<UserFriendViewModel> userFriendViewModels = new List<UserFriendViewModel>();
+            foreach (User user in users)
             {
-                return _userRepository.GetAllUsers();
+                UserFriendViewModel userFriendViewModel = new UserFriendViewModel
+                {
+                    Id = user.Id,
+                    Name = user.Name
+                };
+                userFriendViewModels.Add(userFriendViewModel);
             }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while fetching users.", ex);
-            }
+            return userFriendViewModels;
         }
 
         public void Register(RegisterUserViewModel user,HttpRequest httpRequest)
