@@ -31,11 +31,11 @@ namespace SocailMediaApp.Controllers
         [ProducesResponseType(typeof(ApiResponse<Object>), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetAllUsersSuccessfulResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorDeleteCommentResponseExample))]
-        public ActionResult<ApiResponse<Object>> GetAllUsers()
+        public async Task<ActionResult<ApiResponse<Object>>> GetAllUsers()
         {
             try
             {
-                List<UserFriendViewModel> users = authService.GetAllUsers();
+                List<UserFriendViewModel> users = await authService.GetAllUsers();
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = users;
                 apiResponse.Message = "Users fetched!";
@@ -61,7 +61,7 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status201Created, typeof(RegisterSuccessResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(RegisterValidationErrorResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(RegisterInternalServerErrorResponseExample))]
-        public ActionResult<ApiResponse<Object>> Register([FromBody] RegisterUserViewModel user)
+        public async Task<ActionResult<ApiResponse<Object>>> Register([FromBody] RegisterUserViewModel user)
         {
             if (!ModelState.IsValid)
             {
@@ -127,7 +127,7 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(LoginValidationErrorResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(LoginNotFoundErrorResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(LoginInternalServerErrorResponseExample))]
-        public ActionResult<ApiResponse<Object>> Login([FromBody] LoginUserViewModel user)
+        public async Task<ActionResult<ApiResponse<Object>>> Login([FromBody] LoginUserViewModel user)
         {
             if (!ModelState.IsValid)
             {
@@ -149,7 +149,7 @@ namespace SocailMediaApp.Controllers
             }
             try
             {
-                ReturnedUserView returnedUser = authService.Login(user);
+                ReturnedUserView returnedUser = await authService.Login(user);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = returnedUser;
                 apiResponse.Message = "Login successful!";
@@ -193,7 +193,7 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(UpdateUserNotFoundResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(UpdateUserInternalServerErrorResponseExample))]
        */
-        public ActionResult<ApiResponse<Object>> UpdateUser(int id, [FromForm] UpdateUserViewModel user)
+        public async Task<ActionResult<ApiResponse<Object>>> UpdateUser(int id, [FromForm] UpdateUserViewModel user)
         {
             if (!ModelState.IsValid)
             {
@@ -215,7 +215,7 @@ namespace SocailMediaApp.Controllers
             }
             try
             {
-                authService.UpdateUser(id, user);
+                await authService.UpdateUser(id, user);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "User Updated!";
@@ -245,11 +245,11 @@ namespace SocailMediaApp.Controllers
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(VerifySuccessResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(VerifyInternalServerErrorResponseExample))]
-        public ActionResult<ApiResponse<Object>> Verify(int id)
+        public async Task<ActionResult<ApiResponse<Object>>> Verify(int id)
         {
             try
             {
-                authService.Verify(id);
+                await authService.Verify(id);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Email Confirmed!";

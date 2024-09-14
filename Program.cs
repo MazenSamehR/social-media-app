@@ -9,6 +9,8 @@ using Swashbuckle.AspNetCore.Filters;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using dotenv.net;
+using Microsoft.EntityFrameworkCore;
+using SocailMediaApp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,14 +47,20 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddSingleton<List<User>>();
-builder.Services.AddSingleton<List<Post>>();
-builder.Services.AddSingleton<UserRepository>();
-builder.Services.AddSingleton<PostRepository>();
-builder.Services.AddSingleton<FollowingManagementService>();
-builder.Services.AddSingleton<PostService>();
-builder.Services.AddSingleton<UserService>();
-builder.Services.AddSingleton<ImageService>();
+builder.Services.AddDbContext<SocialMediaContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")),
+    ServiceLifetime.Scoped); // Set DbContext as singleton
+
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<PostRepository>();
+
+builder.Services.AddScoped<FollowingManagementService>();
+builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<UserService>();
+
+builder.Services.AddScoped<ImageService>();
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

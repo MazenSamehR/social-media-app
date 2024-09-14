@@ -1,89 +1,122 @@
 ﻿using SocailMediaApp.Controllers;
 using SocailMediaApp.Exceptions;
 using SocailMediaApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace SocailMediaApp.Repositories
 {
     public class UserRepository
     {
-        public List<User> _users;
-        public UserRepository(List<User> users)
+        private readonly SocialMediaContext _context;
+
+        public UserRepository(SocialMediaContext context)
         {
-            _users = users;
+            _context = context;
         }
 
-        public List<User> GetAllUsers()
+        public async Task<List<User>> GetAllUsers()
         {
-            return _users;
+            return await _context.Users.Select(u => new User
+            {
+                Id = u.Id,
+                Name = u.Name,
+                Email = u.Email,
+                ProfileImageUrl = u.ProfileImageUrl,
+                EmailConfirmed = u.EmailConfirmed,
+                Phone = u.Phone,
+                Address = u.Address
+            }).ToListAsync();
         }
 
-        public User? GetUserByEmail (string email)
+        public async Task<User?> GetUserByEmail(string email)
         {
-
-            return _users.FirstOrDefault(u => u.Email.Equals(email));
-        }
-        public User? GetUserById(int id)
-        {
-            return _users.FirstOrDefault(u => u.Id.Equals(id));
+            return await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
         }
 
-        public List<User> GetAllFollowing(int userId)
+        public async Task<User?> GetUserById(int id)
         {
-            User? user = GetUserById(userId);
+            return await _context.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<User>> GetAllFollowing(int userId)
+        {
+            var user = await GetUserById(userId);
             if (user == null)
                 throw new NotFoundException("User not found");
-            return user.Following;
+
+            // Return the list of Users that the user is following
+            return await _context.UserFollowers
+                .Where(uf => uf.FollowerId == userId)
+                .Select(uf => uf.Followed) // Fetch the actual User entity
+                .ToListAsync();
         }
-        public List<User> GetAllFollowers(int userId)
+
+        public async Task<List<User>> GetAllFollowers(int userId)
         {
-            User? user = GetUserById(userId);
+            var user = await GetUserById(userId);
             if (user == null)
                 throw new NotFoundException("User not found");
-            return user.Followers;
+
+            // Return the list of Users that are following the user
+            return await _context.UserFollowers
+                .Where(uf => uf.FollowedId == userId)
+                .Select(uf => uf.Follower) // Fetch the actual User entity
+                .ToListAsync();
         }
 
-        public bool IsFollowing(User sender,User receiver)
+
+        public bool IsFollowing(User sender, User receiver)
         {
-            return sender.Following.Find(following => following.Equals(receiver)) != null;
+            return _context.UserFollowers.Any(uf => uf.FollowerId == sender.Id && uf.FollowedId == receiver.Id);
         }
 
-        public void AddUser(User user)
+        public async Task FollowUser(User sender, User receiver)
         {
-            user.Id = _users.Count + 1;
-            _users.Add(user);
+            var userFollower = new UserFollower
+            {
+                FollowerId = sender.Id,
+                FollowedId = receiver.Id
+            };
+
+            _context.UserFollowers.Add(userFollower);
+            await _context.SaveChangesAsync();
         }
 
-        public void FollowUser(User sender,User receiver)
+        public async Task UnfollowUser(User sender, User receiver)
         {
-            sender.Following.Add(receiver);
-            receiver.Followers.Add(sender);
+            var userFollower = await _context.UserFollowers
+                .FirstOrDefaultAsync(uf => uf.FollowerId == sender.Id && uf.FollowedId == receiver.Id);
 
-            // TODO : save users info into the database instead of the in-memory list
-        }
-        public void UnfollowUser(User sender, User receiver)
-        {
-            sender.Following.Remove(receiver);
-            receiver.Followers.Remove(sender);
-
-            // TODO : save users info into the database instead of the in-memory list
+            if (userFollower != null)
+            {
+                _context.UserFollowers.Remove(userFollower);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public void UpdateUserConfirmation(User user)
+        public async Task AddUser(User user)
         {
-            User? foundUser = GetUserById(user.Id);
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateUserConfirmation(User user)
+        {
+            var foundUser = await GetUserById(user.Id);
             if (foundUser != null)
             {
                 foundUser.EmailConfirmed = true;
+                _context.Users.Update(foundUser);
+                await _context.SaveChangesAsync();
             }
         }
-        
-        public void UpdateUser(int userId, User user)
+
+        public async Task UpdateUser(int userId, User user)
         {
-            User? foundUser = GetUserById(userId);
+            var foundUser = await GetUserById(userId);
             if (foundUser == null)
-            {
                 throw new NotFoundException("User not found!");
-            }
+
             foundUser.Name = user.Name;
             foundUser.Email = user.Email;
             foundUser.Password = user.Password;
@@ -91,24 +124,25 @@ namespace SocailMediaApp.Repositories
             foundUser.EmailConfirmed = user.EmailConfirmed;
             foundUser.Phone = user.Phone;
             foundUser.Address = user.Address;
-            // TODO : save users info into the database instead of the in-memory list
 
+            _context.Users.Update(foundUser);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteUser(User user)
+        public async Task DeleteUser(User user)
         {
-            _users.Remove(user);
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
         }
-        public void DeleteUser(int userId)
+
+        public async Task DeleteUser(int userId)
         {
-            User? user = GetUserById(userId);
+            var user = await GetUserById(userId);
             if (user == null)
-            {
                 throw new NotFoundException("User not found!");
-            }
-            _users.Remove(user);
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
         }
-
-
     }
 }

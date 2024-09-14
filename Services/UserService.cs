@@ -20,9 +20,9 @@ namespace SocailMediaApp.Services
             _imageService = imageService;
         }
 
-        public List<UserFriendViewModel> GetAllUsers()
+        public async Task<List<UserFriendViewModel>> GetAllUsers()
         {
-            List<User> users = _userRepository.GetAllUsers();
+            List<User> users = await _userRepository.GetAllUsers();
             //convert users to user friend view models
             List<UserFriendViewModel> userFriendViewModels = new List<UserFriendViewModel>();
             foreach (User user in users)
@@ -38,9 +38,9 @@ namespace SocailMediaApp.Services
             return userFriendViewModels;
         }
 
-        public void Register(RegisterUserViewModel user,HttpRequest httpRequest)
+        public async void Register(RegisterUserViewModel user,HttpRequest httpRequest)
         {
-            User? foundUser = _userRepository.GetUserByEmail(user.Email);
+            User? foundUser = await _userRepository.GetUserByEmail(user.Email);
             if (foundUser != null)
             {
                 throw new AlreadyExistesException("Email already exists.");
@@ -55,7 +55,7 @@ namespace SocailMediaApp.Services
                 Phone = user.Phone
             };
 
-            _userRepository.AddUser(convertedUser);
+            await _userRepository.AddUser(convertedUser);
             /*try
             {
                 SendConfirmationEmail(convertedUser, httpRequest);
@@ -99,10 +99,10 @@ namespace SocailMediaApp.Services
             }
         }
 
-        public ReturnedUserView Login(LoginUserViewModel user)
+        public async Task<ReturnedUserView> Login(LoginUserViewModel user)
         {
 
-                User? foundUser = _userRepository.GetUserByEmail(user.Email);
+                User? foundUser = await _userRepository.GetUserByEmail(user.Email);
                 if (foundUser == null)
                 {
                     throw new NotFoundException("Email not found!");
@@ -131,10 +131,10 @@ namespace SocailMediaApp.Services
            
         }
 
-        public void Verify(int id)
+        public async Task Verify(int id)
         {
  
-                User? foundUser = _userRepository.GetUserById(id);
+                User? foundUser = await _userRepository.GetUserById(id);
                 if (foundUser == null)
                 {
                     throw new KeyNotFoundException("User not found!");
@@ -146,13 +146,13 @@ namespace SocailMediaApp.Services
                 }
 
                 foundUser.EmailConfirmed = true;
-                _userRepository.UpdateUserConfirmation(foundUser); 
+                await _userRepository.UpdateUserConfirmation(foundUser); 
             
 
         }
-        public void UpdateUser(int id, UpdateUserViewModel user)
+        public async Task UpdateUser(int id, UpdateUserViewModel user)
         {
-            User? foundUser = _userRepository.GetUserById(id);
+            User? foundUser = await _userRepository.GetUserById(id);
             if (foundUser == null)
             {
                 throw new NotFoundException("User not found!");
@@ -169,11 +169,11 @@ namespace SocailMediaApp.Services
                 foundUser.Address = user.Address;
             if (user.ProfileImage != null)
             {
-                string imageUrl = _imageService.UploadImage(user.ProfileImage);
+                string imageUrl = await _imageService.UploadImage(user.ProfileImage);
                 foundUser.ProfileImageUrl = imageUrl;
             }
 
-            _userRepository.UpdateUser(id,foundUser);
+            await _userRepository.UpdateUser(id, foundUser);
         }
     }
 }

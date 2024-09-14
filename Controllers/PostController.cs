@@ -31,11 +31,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status201Created, typeof(SuccessfulCreatePostResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundCreatePostResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorCreatePostResponseExample))]
-        public ActionResult<ApiResponse<Object>> CreatePost([FromForm] SavePostViewModel postViewModel)
+        public async Task<ActionResult<ApiResponse<Object>>> CreatePost([FromForm] SavePostViewModel postViewModel)
         {
             try
             {
-                _postService.AddPost(postViewModel);
+                await _postService.AddPost(postViewModel);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Post created successfully";
@@ -64,11 +64,11 @@ namespace SocailMediaApp.Controllers
         }
 
         [HttpGet]
-        public ActionResult<ApiResponse<Object>> GetAllPosts()
+        public async Task<ActionResult<ApiResponse<Object>>> GetAllPosts()
         {
             try
             {
-                List<ReadPostViewModel> posts = _postService.GetAllPosts();
+                List<ReadPostViewModel> posts = await _postService.GetAllPosts();
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = posts;
                 apiResponse.Message = "Posts fetched successfully";
@@ -94,11 +94,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UserPostsSuccessResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundGetUserPostsResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorGetUserPostsResponseExample))]
-        public ActionResult<ApiResponse<Object>> GetUserPosts(int id)
+        public async Task<ActionResult<ApiResponse<Object>>> GetUserPosts(int id)
         {
             try
             {
-                List<ReadPostViewModel> post = _postService.GetPostsByUserId(id);
+                List<ReadPostViewModel> post = await _postService.GetPostsByUserId(id);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = post;
                 apiResponse.Message = "Post fetched successfully";
@@ -130,11 +130,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetSinglePostSuccessfulResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(PostNotFoundResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(GetSinglePostInternalServerErrorResponseExample))]
-        public ActionResult<ApiResponse<Object>> GetPost(int id)
+        public async Task<ActionResult<ApiResponse<Object>>> GetPost(int id)
         {
             try
             {
-                ReadPostViewModel post = _postService.GetPostById(id);
+                ReadPostViewModel post = await _postService.GetPostById(id);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = post;
                 apiResponse.Message = "Post fetched successfully";
@@ -166,11 +166,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulGetUserHomePostsResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundGetUserHomePostsResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorGetUserHomePostsResponseExample))]
-        public ActionResult<ApiResponse<Object>> GetUserHomePosts(int id)
+        public async Task<ActionResult<ApiResponse<Object>>> GetUserHomePosts(int id)
         {
             try
             {
-                List<ReadPostViewModel> posts = _postService.GetPostsByFollowing(id);
+                List<ReadPostViewModel> posts = await _postService.GetPostsByFollowing(id);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = posts;
                 apiResponse.Message = "Posts of following list fetched successfully";
@@ -204,11 +204,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundUpdatePostResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorUpdatePostResponseExample))]
 
-        public ActionResult<ApiResponse<Object>> UpdatePost(int id, [FromBody] UpdatePostViewModel post)
+        public async Task<ActionResult<ApiResponse<Object>>> UpdatePost(int id, [FromBody] UpdatePostViewModel post)
         {
             try
             {
-                _postService.UpdatePost(id, post);
+                await _postService.UpdatePost(id, post);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Post updated successfully";
@@ -240,11 +240,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulDeletePostResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundDeletePostResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorDeletePostResponseExample))]
-        public ActionResult<ApiResponse<Object>> DeletePost(int id)
+        public async Task<ActionResult<ApiResponse<Object>>> DeletePost(int id)
         {
             try
             {
-                _postService.DeletePost(id);
+                await _postService.DeletePost(id);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Post deleted successfully";
@@ -278,11 +278,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status201Created, typeof(SuccessfulCreateCommentResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundCreateCommentResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorCreateCommentResponseExample))]
-        public ActionResult<ApiResponse<Object>> AddCommentToPost([FromBody] SaveCommentViewModel comment)
+        public async Task<ActionResult<ApiResponse<Object>>> AddCommentToPost([FromBody] SaveCommentViewModel comment)
         {
             try
             {
-                _postService.AddCommentToPost(comment);
+                await _postService.AddCommentToPost(comment);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Comment added successfully";
@@ -314,11 +314,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulUpdateCommentResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundUpdateCommentResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorUpdateCommentResponseExample))]
-        public ActionResult<ApiResponse<Object>> UpdateCommentInPost(int postId, [FromBody] ChangedCommentViewModel comment)
+        public async Task<ActionResult<ApiResponse<Object>>> UpdateCommentInPost(int postId, [FromBody] ChangedCommentViewModel comment)
         {
             try
             {
-                _postService.UpdateCommentInPost(postId, comment);
+                await _postService.UpdateCommentInPost(postId, comment);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Comment updated successfully";
@@ -350,11 +350,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(SuccessfulDeleteCommentResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(NotFoundDeleteCommentResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorDeleteCommentResponseExample))]
-        public ActionResult<ApiResponse<Object>> DeleteCommentFromPost(int postId, [FromBody] ChangedCommentViewModel comment)
+        public async Task<ActionResult<ApiResponse<Object>>> DeleteCommentFromPost(int postId, [FromBody] DeleteCommentViewModel comment)
         {
             try
             {
-                _postService.DeleteCommentFromPost(postId, comment);
+                await _postService.DeleteCommentFromPost(postId, comment);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Comment deleted successfully";

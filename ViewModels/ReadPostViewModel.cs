@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string Content { get; set; }
         public int UserId { get; set; }
+        public string AuthorName { get; set; } = string.Empty;
         public string? ProfileImageUrl { get; set; }
         public string? PostImageUrl { get; set; }
         public DateTime PublishedOn { get; set; }

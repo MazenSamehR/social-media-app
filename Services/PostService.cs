@@ -18,16 +18,17 @@ namespace SocailMediaApp.Services
             _imageService = imageService;
         }
 
-        private List<ReadCommentViewModel> AddCommentViewModel(Post post)
+        private async Task<List<ReadCommentViewModel>> AddCommentViewModel(Post post)
         {
             List<ReadCommentViewModel> commentViewModels = new List<ReadCommentViewModel>();
             foreach (var comment in post.Comments)
             {
+                User? author = await _userRepository.GetUserById(comment.UserId);
                 UserFriendViewModel userFriendViewModel = new UserFriendViewModel
                 {
-                    Id = comment.Author.Id,
-                    Name = comment.Author.Name,
-                    ProfileImageUrl = comment.Author.ProfileImageUrl
+                    Id = author.Id,
+                    Name = author.Name,
+                    ProfileImageUrl = author.ProfileImageUrl
                 };
                 ReadCommentViewModel commentViewModel = new ReadCommentViewModel
                 {
@@ -41,9 +42,9 @@ namespace SocailMediaApp.Services
             return commentViewModels;
         }
 
-        private ReadPostViewModel GetReadPostViewModel(Post post)
+        private async Task<ReadPostViewModel> GetReadPostViewModel(Post post)
         {
-            List<ReadCommentViewModel> commentViewModels = AddCommentViewModel(post);
+            List<ReadCommentViewModel> commentViewModels = await AddCommentViewModel(post);
 
             ReadPostViewModel postViewModel = new ReadPostViewModel
             {
@@ -51,17 +52,20 @@ namespace SocailMediaApp.Services
                 Content = post.Content,
                 UserId = post.UserId,
                 PublishedOn = post.PublishedOn,
-                ProfileImageUrl = post.Author.ProfileImageUrl,
                 PostImageUrl = post.ImageUrl,
                 Comments = commentViewModels
             };
+            // get user
+            User? user = await _userRepository.GetUserById(post.UserId);
+            postViewModel.ProfileImageUrl = user.ProfileImageUrl;
+            postViewModel.AuthorName = user.Name;
             return postViewModel;
         }
 
-        public void AddPost(SavePostViewModel post)
+        public async Task AddPost(SavePostViewModel post)
         {
             Post convertedPost = new Post();
-            User? foundUser = _userRepository.GetUserById(post.UserId);
+            User? foundUser = await _userRepository.GetUserById(post.UserId);
             if (foundUser == null)
                 throw new NotFoundException("User not found");
             convertedPost.UserId = post.UserId;
@@ -70,52 +74,56 @@ namespace SocailMediaApp.Services
             convertedPost.PublishedOn = DateTime.Now;
             if(post.Image != null)
             {
-                convertedPost.ImageUrl = _imageService.UploadImage(post.Image);
+                convertedPost.ImageUrl = await _imageService.UploadImage(post.Image);
             }
-            _postRepository.AddPost(convertedPost);
+            await _postRepository.AddPost(convertedPost);
         }
 
-        public ReadPostViewModel GetPostById(int id)
+        public async Task<ReadPostViewModel> GetPostById(int id)
         {
-            Post? foundPost = _postRepository.GetPostById(id);
+            Post? foundPost = await _postRepository.GetPostById(id);
             if (foundPost == null)
                 throw new NotFoundException("Post not found");
-            ReadPostViewModel postViewModel = GetReadPostViewModel(foundPost);
+            ReadPostViewModel postViewModel = await GetReadPostViewModel(foundPost);
             return postViewModel;
         }
-        public List<ReadPostViewModel> GetPostsByUserId(int userId)
+        public async Task<List<ReadPostViewModel>> GetPostsByUserId(int userId)
         {
-            User? foundUser = _userRepository.GetUserById(userId);
+            User? foundUser = await _userRepository.GetUserById(userId);
             if (foundUser == null)
                 throw new NotFoundException("User not found");
-            List<Post> posts = _postRepository.GetPostsByUserId(userId);
+            List<Post> posts = await _postRepository.GetPostsByUserId(userId);
+            posts.ForEach(post =>
+            {
+                post.Comments = _postRepository.GetCommentsByPostId(post.Id).Result;
+            });
             List<ReadPostViewModel> postViewModels = new List<ReadPostViewModel>();
             foreach (var post in posts)
             {
-                ReadPostViewModel postViewModel = GetReadPostViewModel(post);
+                ReadPostViewModel postViewModel = await GetReadPostViewModel(post);
 
                 postViewModels.Add(postViewModel);
             }
             return postViewModels;
         }
 
-        public List<ReadPostViewModel> GetPostsByFollowing(int userId)
+        public async Task<List<ReadPostViewModel>> GetPostsByFollowing(int userId)
         {
-            User? foundUser = _userRepository.GetUserById(userId);
+            User? foundUser = await _userRepository.GetUserById(userId);
             if (foundUser == null)
                 throw new NotFoundException("User not found");
-            List<User> followingList = foundUser.Following;
-            List<User> allUsers = _userRepository.GetAllUsers();
+            List<string> followingListEmails = _userRepository.GetAllFollowing(userId).Result.Select(u => u.Email).ToList();
+            List<User> allUsers = await _userRepository.GetAllUsers();
             List<ReadPostViewModel> allPosts = new List<ReadPostViewModel>();
             List<ReadPostViewModel> nonFollowingPosts = new List<ReadPostViewModel>();
             foreach(var user in allUsers)
             {
-                if(user.Equals(foundUser))
+                if(user.Email.Equals(foundUser.Email))
                 {
                     continue;
                 }
-                List<ReadPostViewModel> posts = GetPostsByUserId(user.Id);
-                if (followingList.Contains(user))
+                List<ReadPostViewModel> posts = await GetPostsByUserId(user.Id);
+                if (followingListEmails.Contains(user.Email))
                 {
                     foreach(var post in posts)
                     {
@@ -136,78 +144,78 @@ namespace SocailMediaApp.Services
 
 
 
-        public List<ReadPostViewModel> GetAllPosts()
+        public async Task<List<ReadPostViewModel>> GetAllPosts()
         {
-            List<Post> posts = _postRepository.GetAllPosts();
+            List<Post> posts = await _postRepository.GetAllPosts();
             List<ReadPostViewModel> postViewModels = new List<ReadPostViewModel>();
             foreach (var post in posts)
             {
                 
-                ReadPostViewModel postViewModel = GetReadPostViewModel(post);
+                ReadPostViewModel postViewModel = await GetReadPostViewModel(post);
 
                 postViewModels.Add(postViewModel);
             }
             return postViewModels;
         }
 
-        public void UpdatePost(int id, UpdatePostViewModel post)
+        public async Task UpdatePost(int id, UpdatePostViewModel post)
         {
-            Post? foundPost = _postRepository.GetPostById(id);
+            Post? foundPost = await _postRepository.GetPostById(id);
             if (foundPost == null)
                 throw new NotFoundException("Post not found");
             foundPost.Content = post.Content;
-            _postRepository.UpdatePost(foundPost);
+            await _postRepository.UpdatePost(foundPost);
         }
 
-        public void AddCommentToPost(SaveCommentViewModel comment)
+        public async Task AddCommentToPost(SaveCommentViewModel comment)
         {
             int postId = comment.PostId;
-            Post? foundPost = _postRepository.GetPostById(postId);
+            Post? foundPost = await _postRepository.GetPostById(postId);
             if (foundPost == null)
                 throw new NotFoundException("Post not found");
-            User? foundUser = _userRepository.GetUserById(comment.UserId);
+            User? foundUser = await _userRepository.GetUserById(comment.UserId);
             if (foundUser == null)
                 throw new NotFoundException("User not found");
             Comment convertedComment = new Comment();
-            convertedComment.Id = foundPost.Comments.Count + 1;
             convertedComment.UserId = comment.UserId;
             convertedComment.Author = foundUser;
             convertedComment.Content = comment.Content;
             convertedComment.PublishedOn = DateTime.Now;
             convertedComment.PostId = postId;
             foundPost.Comments.Add(convertedComment);
+            await _postRepository.AddCommentToPost(convertedComment, foundPost);
         }
-        public void UpdateCommentInPost(int postId, ChangedCommentViewModel comment)
+        public async Task UpdateCommentInPost(int postId, ChangedCommentViewModel comment)
         {
-            Post? foundPost = _postRepository.GetPostById(postId);
+            Post? foundPost = await _postRepository.GetPostById(postId);
             if (foundPost == null)
                 throw new NotFoundException("Post not found");
-            Comment? convertedComment = _postRepository.GetCommendById(postId, comment.CommendtId);
+            Comment? convertedComment = await _postRepository.GetCommendById(postId, comment.CommendtId);
             if(convertedComment == null)
                 throw new NotFoundException("Comment not found");
             convertedComment.Content = comment.Content;
-            _postRepository.UpdateCommentInPost(convertedComment,foundPost);
+            await _postRepository.UpdateCommentInPost(convertedComment, foundPost);
         }
 
-        public void DeleteCommentFromPost(int postId, ChangedCommentViewModel comment)
+        public async Task DeleteCommentFromPost(int postId, DeleteCommentViewModel comment)
         {
-            Post? foundPost = _postRepository.GetPostById(postId);
+            Post? foundPost = await _postRepository.GetPostById(postId);
             if (foundPost == null)
                 throw new NotFoundException("Post not found");
-            Comment? convertedComment = _postRepository.GetCommendById(postId, comment.CommendtId);
+            Comment? convertedComment = await _postRepository.GetCommendById(postId, comment.CommentId);
             if (convertedComment == null)
                 throw new NotFoundException("Comment not found");
 
-            _postRepository.DeleteCommendtFromPost(convertedComment, foundPost);
+            await _postRepository.DeleteCommendtFromPost(convertedComment, foundPost);
         }
 
 
-        public void DeletePost(int id)
+        public async Task DeletePost(int id)
         {
-            Post? foundPost = _postRepository.GetPostById(id);
+            Post? foundPost = await _postRepository.GetPostById(id);
             if (foundPost == null)
                 throw new NotFoundException("Post not found");
-            _postRepository.DeletePost(id);
+            await _postRepository.DeletePost(id);
         }
 
     }

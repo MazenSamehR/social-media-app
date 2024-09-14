@@ -30,11 +30,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(FollowBadRequestResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(FollowYourselfesponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(FollowInternalServerErrorResponseExample))]
-        public ActionResult<ApiResponse<Object>> Follow([FromBody] FollowRequestViewModel friendRequest)
+        public async Task<ActionResult<ApiResponse<Object>>> Follow([FromBody] FollowRequestViewModel friendRequest)
         {
             try
             {
-                _followingManagementService.FollowUser(friendRequest);
+                await _followingManagementService.FollowUser(friendRequest);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Followed successfully!";
@@ -85,11 +85,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(FollowingListBadRequestResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(FollowingListInternalServerErrorResponseExample))]
 
-        public ActionResult<ApiResponse<Object>> GetFollowingList(int userId)
+        public async Task<ActionResult<ApiResponse<Object>>> GetFollowingList(int userId)
         {
             try
             {
-                List<UserFriendViewModel> followingList = _followingManagementService.GetFollowingList(userId);
+                List<UserFriendViewModel> followingList = await _followingManagementService.GetFollowingList(userId);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = followingList;
                 apiResponse.Message = "Followeing list fetched successfully!";
@@ -132,11 +132,11 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(FollowingListBadRequestResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(FollowingListInternalServerErrorResponseExample))]
 
-        public ActionResult<ApiResponse<Object>> GetFollowerList(int userId)
+        public async Task<ActionResult<ApiResponse<Object>>> GetFollowerList(int userId)
         {
             try
             {
-                List<UserFriendViewModel> followersList = _followingManagementService.GetFollowersList(userId);
+                List<UserFriendViewModel> followersList = await _followingManagementService.GetFollowersList(userId);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = followersList;
                 apiResponse.Message = "Follower list fetched successfully!";
@@ -178,7 +178,7 @@ namespace SocailMediaApp.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(UnfollowBadRequestResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(UnfollowInternalServerErrorResponseExample))]
 
-        public ActionResult<ApiResponse<Object>> Unfollow([FromBody] FollowRequestViewModel friendRequest)
+        public async Task<ActionResult<ApiResponse<Object>>> Unfollow([FromBody] FollowRequestViewModel friendRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -200,7 +200,7 @@ namespace SocailMediaApp.Controllers
             }
             try
             {
-                _followingManagementService.Unfollow(friendRequest);
+                await _followingManagementService.Unfollow(friendRequest);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "Unfollowed successfully!";

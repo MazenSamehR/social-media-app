@@ -1,5 +1,8 @@
-﻿namespace SocailMediaApp.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SocailMediaApp.Models
 {
+    [Table("posts")]
     public class Post
     {
         public int Id { get; set; }

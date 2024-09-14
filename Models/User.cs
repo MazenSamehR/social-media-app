@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SocailMediaApp.Models
 {
+    [Table("users")]
     public class User
     {
         public int Id { get; set; }
@@ -21,8 +23,8 @@ namespace SocailMediaApp.Models
         public string? Phone { get; set; }
         public string? Address { get; set; }
 
-        public List<User> Following = new List<User>();
-        public List<User> Followers = new List<User>();
+        public List<UserFollower> Following = new List<UserFollower>();
+        public List<UserFollower> Followers = new List<UserFollower>();
         public List<Post> Posts = new List<Post>();
     }
 }

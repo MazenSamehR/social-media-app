@@ -13,65 +13,67 @@ namespace SocailMediaApp.Services
             this._userRepository = _userRepository;
         }
 
-        public void FollowUser(FollowRequestViewModel followRequest)
+        public async Task FollowUser(FollowRequestViewModel followRequest)
         {
             int senderId = followRequest.senderId;
             int receiverId = followRequest.receiverId;
             if (senderId == receiverId)
                 throw new InvalidOperationException("You cant follow yourself");
-            User? senderUser = _userRepository.GetUserById(senderId);
+            User? senderUser = await _userRepository.GetUserById(senderId);
             if (senderUser == null)
                 throw new NotFoundException("Sender User not found");
-            User? receiverUser = _userRepository.GetUserById(receiverId);
+            User? receiverUser = await _userRepository.GetUserById(receiverId);
             if (receiverUser == null)
                 throw new NotFoundException("Receiver User not found");
             if (_userRepository.IsFollowing(senderUser, receiverUser))
                 throw new AlreadyExistesException("Already being followed");
-            _userRepository.FollowUser(senderUser, receiverUser);
+            await _userRepository.FollowUser(senderUser, receiverUser);
         }
 
-        public void Unfollow(FollowRequestViewModel followRequest)
+        public async Task Unfollow(FollowRequestViewModel followRequest)
         {
             int senderId = followRequest.senderId;
             int receiverId = followRequest.receiverId;
             if (senderId == receiverId)
                 throw new InvalidOperationException("You cannot follow yourself");
-            User? senderUser = _userRepository.GetUserById(senderId);
+            User? senderUser = await _userRepository.GetUserById(senderId);
             if (senderUser == null)
                 throw new NotFoundException("Sender User not found");
-            User? receiverUser = _userRepository.GetUserById(receiverId);
+            User? receiverUser = await _userRepository.GetUserById(receiverId);
             if (receiverUser == null)
                 throw new NotFoundException("Receiver User not found");
             if (!_userRepository.IsFollowing(senderUser, receiverUser))
                 throw new NotFoundException("You are not following the other user");
-            _userRepository.UnfollowUser(senderUser, receiverUser);
+            await _userRepository.UnfollowUser(senderUser, receiverUser);
         }
-        public List<UserFriendViewModel> GetFollowingList(int userId)
+        public async Task<List<UserFriendViewModel>> GetFollowingList(int userId)
         {
-            User? foundUser = _userRepository.GetUserById(userId);
+            User? foundUser = await _userRepository.GetUserById(userId);
             if (foundUser == null)
                 throw new NotFoundException("User not found");
-            List<User> followingList = _userRepository.GetAllFollowing(userId);
+            List<User> followingList = await _userRepository.GetAllFollowing(userId);
             List<UserFriendViewModel> userFriendViews = new List<UserFriendViewModel>();
             followingList.ForEach(user => {
                 UserFriendViewModel userFriendViewModel = new UserFriendViewModel();
                 userFriendViewModel.Id = user.Id;
                 userFriendViewModel.Name = user.Name;
+                userFriendViewModel.ProfileImageUrl = user.ProfileImageUrl;
                 userFriendViews.Add(userFriendViewModel);
             });
             return userFriendViews;
         }
-        public List<UserFriendViewModel> GetFollowersList(int userId)
+        public async Task<List<UserFriendViewModel>> GetFollowersList(int userId)
         {
-            User? foundUser = _userRepository.GetUserById(userId);
+            User? foundUser = await _userRepository.GetUserById(userId);
             if (foundUser == null)
                 throw new NotFoundException("User not found");
-            List<User> followingList = _userRepository.GetAllFollowers(userId);
+            List<User> followingList = await _userRepository.GetAllFollowers(userId);
             List<UserFriendViewModel> userFriendViews = new List<UserFriendViewModel>();
             followingList.ForEach(user => {
                 UserFriendViewModel userFriendViewModel = new UserFriendViewModel();
                 userFriendViewModel.Id = user.Id;
                 userFriendViewModel.Name = user.Name;
+                userFriendViewModel.ProfileImageUrl = user.ProfileImageUrl;
                 userFriendViews.Add(userFriendViewModel);
             });
             return userFriendViews;
