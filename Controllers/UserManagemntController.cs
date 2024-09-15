@@ -83,7 +83,7 @@ namespace SocailMediaApp.Controllers
             }
             try
             {
-                authService.Register(user,HttpContext.Request);
+                await authService.Register(user,HttpContext.Request);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
                 apiResponse.Body = null;
                 apiResponse.Message = "User Registered, Check your mail to confirm";
@@ -215,9 +215,9 @@ namespace SocailMediaApp.Controllers
             }
             try
             {
-                await authService.UpdateUser(id, user);
+                string? profileImageUrl = await authService.UpdateUser(id, user);
                 ApiResponse<Object> apiResponse = new ApiResponse<Object>();
-                apiResponse.Body = null;
+                apiResponse.Body = profileImageUrl;
                 apiResponse.Message = "User Updated!";
                 apiResponse.StatusCode = HttpStatusCode.OK;
                 return apiResponse;

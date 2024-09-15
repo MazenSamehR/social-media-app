@@ -38,7 +38,7 @@ namespace SocailMediaApp.Services
             return userFriendViewModels;
         }
 
-        public async void Register(RegisterUserViewModel user,HttpRequest httpRequest)
+        public async Task Register(RegisterUserViewModel user,HttpRequest httpRequest)
         {
             User? foundUser = await _userRepository.GetUserByEmail(user.Email);
             if (foundUser != null)
@@ -150,7 +150,7 @@ namespace SocailMediaApp.Services
             
 
         }
-        public async Task UpdateUser(int id, UpdateUserViewModel user)
+        public async Task<string?> UpdateUser(int id, UpdateUserViewModel user)
         {
             User? foundUser = await _userRepository.GetUserById(id);
             if (foundUser == null)
@@ -167,13 +167,15 @@ namespace SocailMediaApp.Services
                 foundUser.Phone = user.Phone;
             if(user.Address != null)
                 foundUser.Address = user.Address;
+            string? profileImageUrl = null;
             if (user.ProfileImage != null)
             {
-                string imageUrl = await _imageService.UploadImage(user.ProfileImage);
-                foundUser.ProfileImageUrl = imageUrl;
+                profileImageUrl = await _imageService.UploadImage(user.ProfileImage);
+                foundUser.ProfileImageUrl = profileImageUrl;
             }
 
             await _userRepository.UpdateUser(id, foundUser);
+            return profileImageUrl;
         }
     }
 }
