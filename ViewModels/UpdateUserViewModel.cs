@@ -7,8 +7,6 @@ namespace SocailMediaApp.ViewModels
         [MaxLength(20)]
         [MinLength(5)]
         public string? Name { get; set; }
-        [EmailAddress]
-        public string? Email { get; set; }
         [MinLength(8)]
         public string? Password { get; set; }
 

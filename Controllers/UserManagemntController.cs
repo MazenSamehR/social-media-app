@@ -245,25 +245,80 @@ namespace SocailMediaApp.Controllers
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(VerifySuccessResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(VerifyInternalServerErrorResponseExample))]
-        public async Task<ActionResult<ApiResponse<Object>>> Verify(int id)
+        public async Task<ActionResult> Verify(int id)
         {
             try
             {
                 await authService.Verify(id);
-                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
-                apiResponse.Body = null;
-                apiResponse.Message = "Email Confirmed!";
-                apiResponse.StatusCode = HttpStatusCode.OK;
-                return apiResponse;
+
+                var htmlResponse = $@"
+            <!DOCTYPE html>
+            <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>Email Confirmation - Success</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #e9f5f6; color: #333; }}
+                    .container {{ max-width: 600px; margin: auto; padding: 20px; background: #ffffff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }}
+                    h1 {{ color: #28a745; margin-top: 0; }}
+                    p {{ margin-bottom: 0; }}
+                    .button {{ display: inline-block; padding: 10px 20px; margin-top: 20px; background-color: #28a745; color: #fff; text-decoration: none; border-radius: 4px; }}
+                    .button:hover {{ background-color: #218838; }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <h1>Email Confirmed!</h1>
+                    <p>Your email address has been successfully verified. You can now proceed with the next steps.</p>
+                    <a href='/' class='button'>Go to Homepage</a>
+                </div>
+            </body>
+            </html>";
+
+                return new ContentResult
+                {
+                    Content = htmlResponse,
+                    ContentType = "text/html",
+                    StatusCode = (int)HttpStatusCode.OK
+                };
             }
             catch
             {
-                ApiResponse<Object> apiResponse = new ApiResponse<Object>();
-                apiResponse.Body = null;
-                apiResponse.Message = "Internal Server Error, Try again later";
-                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
-                return apiResponse;
+                var htmlResponse = $@"
+            <!DOCTYPE html>
+            <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>Email Confirmation - Error</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f2f4f7; color: #333; }}
+                    .container {{ max-width: 600px; margin: auto; padding: 20px; background: #ffffff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }}
+                    h1 {{ color: #dc3545; margin-top: 0; }}
+                    p {{ margin-bottom: 0; }}
+                    .button {{ display: inline-block; padding: 10px 20px; margin-top: 20px; background-color: #dc3545; color: #fff; text-decoration: none; border-radius: 4px; }}
+                    .button:hover {{ background-color: #c82333; }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <h1>Internal Server Error</h1>
+                    <p>We encountered an issue while processing your request. Please try again later.</p>
+                    <a href='/' class='button'>Go to Homepage</a>
+                </div>
+            </body>
+            </html>";
+
+                return new ContentResult
+                {
+                    Content = htmlResponse,
+                    ContentType = "text/html",
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
             }
         }
+
+
     }
 }

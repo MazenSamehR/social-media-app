@@ -118,7 +118,7 @@ namespace SocailMediaApp.Services
 
                 if (!foundUser.EmailConfirmed)
                 {
-                    throw new InvalidException("Email is not confiremd!");
+                    throw new InvalidException("Email is not confirmed!");
                 }
                 ReturnedUserView returnedUserView = new ReturnedUserView
                 {
@@ -161,8 +161,6 @@ namespace SocailMediaApp.Services
             }
             if(user.Name != null)
                 foundUser.Name = user.Name;
-            if(user.Email != null)
-                foundUser.Email = user.Email;
             if(user.Password != null)
                 foundUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             if (user.Phone != null)
