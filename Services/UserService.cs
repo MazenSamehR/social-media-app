@@ -56,20 +56,20 @@ namespace SocailMediaApp.Services
             };
 
             await _userRepository.AddUser(convertedUser);
-            /*try
+            try
             {
-                SendConfirmationEmail(convertedUser, httpRequest);
+                await SendConfirmationEmail(convertedUser, httpRequest);
             }
             catch (Exception e)
             {
-                _userRepository.DeleteUser(convertedUser);
+                await _userRepository.DeleteUser(convertedUser);
                 throw new MailConfirmationException(e.Message);
-            }*/
+            }
 
         }
-        private void SendConfirmationEmail(User user,HttpRequest httpRequest)
+        private async Task SendConfirmationEmail(User user,HttpRequest httpRequest)
         {
-            String verificationLink = httpRequest.Scheme + "://" + httpRequest.Host + "/api/v1/verify/" + user.Id;
+            String verificationLink = httpRequest.Scheme + "://" + httpRequest.Host + "/api/v1/users/verify/" + user.Id;
 
             string htmlBody = $@"
         <html>
@@ -90,11 +90,13 @@ namespace SocailMediaApp.Services
 
                 using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                 {
-                    String username = "";
-                    String password = "";
+                    // Retrieve username and password from environment variables
+                    string? username = Environment.GetEnvironmentVariable("EMAIL_USERNAME");
+                    string? password = Environment.GetEnvironmentVariable("EMAIL_PASSWORD");
+
                     smtp.Credentials = new System.Net.NetworkCredential(username, password);
                     smtp.EnableSsl = true;
-                    smtp.Send(mail);
+                    await smtp.SendMailAsync(mail);
                 }
             }
         }
@@ -105,19 +107,19 @@ namespace SocailMediaApp.Services
                 User? foundUser = await _userRepository.GetUserByEmail(user.Email);
                 if (foundUser == null)
                 {
-                    throw new NotFoundException("Email not found!");
+                    throw new NotFoundException("Credentials are wrong!");
                 }
 
                 bool matchingPassword = BCrypt.Net.BCrypt.Verify(user.Password, foundUser.Password);
                 if (!matchingPassword)
                 {
-                    throw new InvalidException("Wrong Password!");
+                    throw new InvalidException("Credentials are wrong!");
                 }
 
-                /*if (!foundUser.EmailConfirmed)
+                if (!foundUser.EmailConfirmed)
                 {
-                    throw new InvalidException("Email not confirmed!");
-                }*/
+                    throw new InvalidException("Email is not confiremd!");
+                }
                 ReturnedUserView returnedUserView = new ReturnedUserView
                 {
                     Id = foundUser.Id,
@@ -175,6 +177,7 @@ namespace SocailMediaApp.Services
             }
 
             await _userRepository.UpdateUser(id, foundUser);
+            profileImageUrl = foundUser.ProfileImageUrl;
             return profileImageUrl;
         }
     }
